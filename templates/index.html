@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-Powered GRC Risk Analysis Engine — Cybersecurity risk scoring with XGBoost and Isolation Forest anomaly detection">
+    <title>GRC Risk Analysis Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1>GRC Risk Engine</h1>
+                        <span class="subtitle">AI-Powered Security Analysis</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-badge online" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span>System Online</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Panel -->
+            <section class="panel input-panel">
+                <div class="panel-header">
+                    <h2>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="panel-icon">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m5.66-14.66l-4.24 4.24m-2.84 2.84l-4.24 4.24M23 12h-6m-6 0H5m14.66 5.66l-4.24-4.24m-2.84-2.84L8.34 6.34"/>
+                        </svg>
+                        Input Parameters
+                    </h2>
+                </div>
+
+                <form id="analysisForm" class="analysis-form">
+                    <!-- Vulnerability Data -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <span class="section-icon vuln">🛡️</span>
+                            Vulnerability Data
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="cvss_score">CVSS Score</label>
+                                <input type="number" id="cvss_score" name="cvss_score" min="0" max="10" step="0.1" value="7.5" required>
+                                <div class="input-hint">0 - 10</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="vulnerability_type">Vulnerability Type</label>
+                                <select id="vulnerability_type" name="vulnerability_type" required>
+                                    <option value="SQLi">SQL Injection</option>
+                                    <option value="XSS">Cross-Site Scripting</option>
+                                    <option value="SSRF">Server-Side Request Forgery</option>
+                                    <option value="RCE" selected>Remote Code Execution</option>
+                                    <option value="LFI">Local File Inclusion</option>
+                                    <option value="RFI">Remote File Inclusion</option>
+                                    <option value="CSRF">Cross-Site Request Forgery</option>
+                                    <option value="IDOR">Insecure Direct Object Ref</option>
+                                    <option value="XXE">XML External Entity</option>
+                                    <option value="Open Redirect">Open Redirect</option>
+                                    <option value="Buffer Overflow">Buffer Overflow</option>
+                                    <option value="Privilege Escalation">Privilege Escalation</option>
+                                    <option value="Auth Bypass">Authentication Bypass</option>
+                                    <option value="Info Disclosure">Information Disclosure</option>
+                                    <option value="DoS">Denial of Service</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exploit_available">Exploit Available</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="exploit_available" name="exploit_available" checked>
+                                    <label for="exploit_available" class="toggle-label">
+                                        <span class="toggle-inner"></span>
+                                        <span class="toggle-switch-btn"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cve_age_days">CVE Age (Days)</label>
+                                <input type="number" id="cve_age_days" name="cve_age_days" min="0" max="3650" value="30" required>
+                                <div class="input-hint">0 - 3650</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asset Data -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <span class="section-icon asset">🏢</span>
+                            Asset Data
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="asset_criticality">Asset Criticality</label>
+                                <input type="range" id="asset_criticality" name="asset_criticality" min="1" max="5" value="4" class="range-input">
+                                <div class="range-labels">
+                                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                                </div>
+                                <div class="range-value" id="criticalityValue">4</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="internet_exposed">Internet Exposed</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="internet_exposed" name="internet_exposed" checked>
+                                    <label for="internet_exposed" class="toggle-label">
+                                        <span class="toggle-inner"></span>
+                                        <span class="toggle-switch-btn"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="data_sensitivity">Data Sensitivity</label>
+                                <input type="range" id="data_sensitivity" name="data_sensitivity" min="1" max="5" value="4" class="range-input">
+                                <div class="range-labels">
+                                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                                </div>
+                                <div class="range-value" id="sensitivityValue">4</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Behavior Data -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <span class="section-icon behavior">📊</span>
+                            Behavior Data
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="failed_logins">Failed Logins</label>
+                                <input type="number" id="failed_logins" name="failed_logins" min="0" max="1000" value="25" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="request_rate">Request Rate</label>
+                                <input type="number" id="request_rate" name="request_rate" min="0" max="10000" step="0.1" value="1500" required>
+                                <div class="input-hint">req/min</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="traffic_spike">Traffic Spike</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="traffic_spike" name="traffic_spike">
+                                    <label for="traffic_spike" class="toggle-label">
+                                        <span class="toggle-inner"></span>
+                                        <span class="toggle-switch-btn"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="analyze-btn" id="analyzeBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <span>Analyze Risk</span>
+                        <div class="btn-loader" id="btnLoader"></div>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Results Panel -->
+            <section class="panel results-panel" id="resultsPanel">
+                <!-- Risk Score Gauge -->
+                <div class="gauge-container" id="gaugeContainer">
+                    <div class="gauge-wrapper">
+                        <svg class="gauge-svg" viewBox="0 0 200 200" id="gaugeSvg">
+                            <circle class="gauge-bg" cx="100" cy="100" r="85" />
+                            <circle class="gauge-fill" cx="100" cy="100" r="85" id="gaugeFill" />
+                            <circle class="gauge-inner-ring" cx="100" cy="100" r="70" />
+                        </svg>
+                        <div class="gauge-center">
+                            <div class="gauge-score" id="gaugeScore">—</div>
+                            <div class="gauge-label">Risk Score</div>
+                        </div>
+                    </div>
+                    <div class="risk-badge" id="riskBadge">
+                        <span id="riskLevel">—</span>
+                    </div>
+                </div>
+
+                <!-- Anomaly Indicator -->
+                <div class="anomaly-card" id="anomalyCard">
+                    <div class="anomaly-icon" id="anomalyIcon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="anomaly-text">
+                        <h4>Anomaly Detection</h4>
+                        <p id="anomalyStatus">Awaiting analysis...</p>
+                    </div>
+                </div>
+
+                <!-- Confidence Breakdown -->
+                <div class="confidence-card" id="confidenceCard" style="display:none;">
+                    <h4>Model Confidence</h4>
+                    <div class="confidence-bars">
+                        <div class="conf-bar-group">
+                            <span class="conf-label">Low</span>
+                            <div class="conf-bar-bg"><div class="conf-bar low" id="confLow" style="width:0%"></div></div>
+                            <span class="conf-pct" id="confLowPct">0%</span>
+                        </div>
+                        <div class="conf-bar-group">
+                            <span class="conf-label">Med</span>
+                            <div class="conf-bar-bg"><div class="conf-bar medium" id="confMed" style="width:0%"></div></div>
+                            <span class="conf-pct" id="confMedPct">0%</span>
+                        </div>
+                        <div class="conf-bar-group">
+                            <span class="conf-label">High</span>
+                            <div class="conf-bar-bg"><div class="conf-bar high" id="confHigh" style="width:0%"></div></div>
+                            <span class="conf-pct" id="confHighPct">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vulnerability Summary -->
+                <div class="summary-card" id="summaryCard" style="display:none;">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-icon">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        Vulnerability Summary
+                    </h4>
+                    <p id="summaryText"></p>
+                </div>
+
+                <!-- Recommended Actions -->
+                <div class="actions-card" id="actionsCard" style="display:none;">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-icon">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        Recommended Actions
+                    </h4>
+                    <ul id="actionsList"></ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- History Panel -->
+        <section class="panel history-panel" id="historyPanel" style="display:none;">
+            <div class="panel-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="panel-icon">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Analysis History
+                </h2>
+                <button class="clear-history-btn" id="clearHistoryBtn">Clear</button>
+            </div>
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Timestamp</th>
+                            <th>Vuln Type</th>
+                            <th>CVSS</th>
+                            <th>Score</th>
+                            <th>Level</th>
+                            <th>Anomaly</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

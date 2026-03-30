@@ -220,7 +220,7 @@ def main():
     print(f"  XGBoost accuracy:    {accuracy_score(y_test, y_pred):.1%}")
     print(f"  Anomaly model:       Isolation Forest (200 estimators)")
     print("=" * 60)
-
+##subi
 
 if __name__ == "__main__":
     main()
